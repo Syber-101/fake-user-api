@@ -11,11 +11,16 @@ Usage:
 2. Open `public/index.html` in browser
 
 Installation 
+
 1.git clone https://github.com/Syber-101/fake-user-api.git
+
 2.cd fake-user-api
+
 3.npm install
 
+
 Run 'node server.js'
+
 Open 'public/index.html' in your browser.
 
 
