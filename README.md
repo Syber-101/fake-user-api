@@ -10,10 +10,21 @@ Usage:
 1. Run API: `node server.js`
 2. Open `public/index.html` in browser
 
+Installation 
+git clone https://github.com/Syber-101/fake-user-api.git
+cd fake-user-api
+npm install
+
+Run 'node server.js'
+Open 'public/index.html' in your browser.
+
+
+
+
 
 If not working //
 
 1. remove 'node_modules - package-lock.json'
-2. run 'npm init -y' , 'npm install @faker-js/faker express cors'
+2. run 'npm install @faker-js/faker express cors'
 3. and run 'node server.js'
 
