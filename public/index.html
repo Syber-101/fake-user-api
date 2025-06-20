@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Fake User API</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #121212;
+      color: #eee;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #00c3ff;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    select, input, button {
+      padding: 8px 12px;
+      border-radius: 4px;
+      border: none;
+      outline: none;
+    }
+
+    button {
+      background: #00c3ff;
+      color: #121212;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #008db3;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+    }
+
+    .card {
+      background: #1e1e1e;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #000;
+      transition: transform 0.2s;
+    }
+
+    .card:hover {
+      transform: scale(1.03);
+    }
+
+    .card strong {
+      color: #00c3ff;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .empty {
+      text-align: center;
+      color: #ff4b4b;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Fake User API</h1>
+
+  <div class="controls">
+    <select id="countrySelect" onchange="updateCityOptions()">
+      <option value="">Ülke seçin (boş: random)</option>
+      <option value="Turkey">Turkey</option>
+      <option value="France">France</option>
+      <option value="Germany">Germany</option>
+      <option value="USA">USA</option>
+      <option value="Japan">Japan</option>
+    </select>
+
+    <select id="citySelect">
+      <option value="">Şehir seçin (boş: random)</option>
+    </select>
+
+    <input type="number" id="countInput" min="1" value="5" placeholder="Kaç kişi?">
+    <button onclick="getUsers()">Kullanıcıları Çek</button>
+  </div>
+
+  <div id="cards" class="cards"></div>
+
+  <script>
+    const cityData = {
+      'Turkey': ['Istanbul', 'Ankara', 'Izmir'],
+      'France': ['Paris', 'Lyon', 'Nice'],
+      'Germany': ['Berlin', 'Munich', 'Hamburg'],
+      'USA': ['New York', 'Los Angeles', 'Chicago'],
+      'Japan': ['Tokyo', 'Osaka', 'Kyoto']
+    };
+
+    function updateCityOptions() {
+      const country = document.getElementById('countrySelect').value;
+      const citySelect = document.getElementById('citySelect');
+      citySelect.innerHTML = '<option value="">Şehir seçin (boş: random)</option>';
+
+      if (country && cityData[country]) {
+        cityData[country].forEach(city => {
+          const opt = document.createElement('option');
+          opt.value = city;
+          opt.textContent = city;
+          citySelect.appendChild(opt);
+        });
+      }
+    }
+
+    async function getUsers() {
+      const country = document.getElementById('countrySelect').value;
+      const city = document.getElementById('citySelect').value;
+      const count = document.getElementById('countInput').value || 5;
+      const cardsDiv = document.getElementById('cards');
+
+      cardsDiv.innerHTML = '<div class="empty">Yükleniyor...</div>';
+
+      let url = `http://localhost:3000/api/users?count=${count}`;
+      if (country) url += `&country=${encodeURIComponent(country)}`;
+      if (city) url += `&city=${encodeURIComponent(city)}`;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (!Array.isArray(data) || data.length === 0) {
+          cardsDiv.innerHTML = '<div class="empty">Hiç kullanıcı bulunamadı!</div>';
+          return;
+        }
+
+        cardsDiv.innerHTML = '';
+        data.forEach(user => {
+          const div = document.createElement('div');
+          div.className = 'card';
+          div.innerHTML = `
+            <strong>${user.name}</strong>
+            ${user.email}<br>
+            ${user.phone}<br>
+            ${user.address}, ${user.city}, ${user.country}
+          `;
+          cardsDiv.appendChild(div);
+        });
+
+      } catch (err) {
+        console.error(err);
+        cardsDiv.innerHTML = `<div class="empty">Hata: ${err.message}</div>`;
+      }
+    }
+  </script>
+
+</body>
+</html>
